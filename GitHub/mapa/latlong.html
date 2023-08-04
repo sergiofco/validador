@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <script src="https://unpkg.com/wrld.js@1.x.x"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/leaflet.css" rel="stylesheet" />
+  </head>
+  
+  <body>
+  <div style="position: relative">
+    <div id="map" style="height: 400px"></div>
+    <script>
+      var map = Wrld.map("map", "your_api_key_here", {
+        center: [37.7858, -122.401],
+        zoom: 15,
+        indoorsEnabled: true,
+        displayEntranceMarkers: false
+      });
+      map.on("click", function(e) {
+        var latlng = e.latlng;
+        var pixelPosition = map.latLngToLayerPoint(latlng);
+        alert("LatLng = " + latlng + "\n Pixel position = " + pixelPosition);
+      });
+    </script>
+  </div>
+  </body>
+</html>
