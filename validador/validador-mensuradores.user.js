@@ -5,6 +5,8 @@
 // @description  Valida que Presenças <= Inscritos no dia antes de salvar o registro de mensuradores
 // @author       sergiofco
 // @include      /^https?:\/\/webapps\.[^/]+\.sescsp\.org\.br\/estatistico\//
+// @updateURL    https://raw.githubusercontent.com/sergiofco/validador/main/validador/validador-mensuradores.user.js
+// @downloadURL  https://raw.githubusercontent.com/sergiofco/validador/main/validador/validador-mensuradores.user.js
 // @grant        none
 // ==/UserScript==
 
