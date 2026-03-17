@@ -1,0 +1,232 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap');
+
+html, body, #react-entry-point {
+    font-family: 'Ubuntu', sans-serif !important;
+    background: #f3f3f3;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    background: #f3f3f3;
+    font-family: 'Ubuntu', sans-serif !important;
+}
+
+label, div, span, input, button {
+    font-family: 'Ubuntu', sans-serif !important;
+}
+
+/* ================================================
+   FILTROS — uma linha, flex proporcional
+   ================================================ */
+
+.filtro-label {
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    color: #333 !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+    white-space: nowrap !important;
+}
+
+/* wide: macro-grupo, equipe, grupo  */
+.filtro-bloco.filtro-wide {
+    flex: 2 1 160px;
+    min-width: 120px;
+}
+
+/* narrow: tipo, impacto */
+.filtro-bloco.filtro-narrow {
+    flex: 1 1 100px;
+    min-width: 80px;
+}
+
+.filtro-bloco {
+    display: flex;
+    flex-direction: column;
+}
+
+/* texto dentro dos dropdowns menor para caber na linha */
+.filtro-bloco .Select-control,
+.filtro-bloco .Select-placeholder,
+.filtro-bloco .Select-value-label,
+.filtro-bloco .Select-input input,
+.filtro-bloco .Select-menu-outer {
+    font-family: 'Ubuntu', sans-serif !important;
+    font-size: 12px !important;
+}
+
+.btn-limpar {
+    background: rgb(236, 215, 26) !important;
+    color: #000000 !important;
+    border: 1.5px solid #000000 !important;
+    border-radius: 4px !important;
+    padding: 0 14px !important;
+    font-family: 'Ubuntu', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    height: 36px !important;
+    white-space: nowrap !important;
+}
+
+.btn-limpar:hover {
+    background: #C0392B !important;
+    color: white !important;
+}
+
+/* ================================================
+   TIMELINE GERAL
+   ================================================ */
+
+.react-calendar-timeline * {
+    font-family: 'Ubuntu', sans-serif !important;
+}
+
+/* ================================================
+   CABEÇALHO — camada primária (mês)
+   ================================================ */
+
+.react-calendar-timeline .rct-calendar-header {
+    background: #046b7e !important;
+    border-bottom: none !important;
+}
+
+.react-calendar-timeline .rct-dateHeader-primary {
+    background: #046b7e !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: bolder !important;
+    border-left: 0px solid #3a3a3a !important;
+    border-bottom: 0px solid #3a3a3a !important;
+    text-align: center !important;
+    white-space: pre-line !important;
+    line-height: 1.35 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-transform: capitalize !important;
+    letter-spacing: 0.3px !important;
+    padding: 4px 2px !important;
+}
+
+/* mês atual em destaque */
+.react-calendar-timeline .rct-dateHeader-primary.mes-atual {
+    background: #c47004 !important;
+    color: #fff !important;
+    border-left-color: #a93226 !important;
+}
+
+/* ================================================
+   CABEÇALHO — camada secundária (semana / dia)
+   ================================================ */
+
+.react-calendar-timeline .rct-dateHeader {
+    background: #046b7e !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    border-left: 1px solid #5e7377 !important;
+    border-bottom: 0px solid #046b7e !important;
+    text-align: center !important;
+}
+
+/* semana atual em destaque */
+.react-calendar-timeline .rct-dateHeader.semana-atual {
+    background: #c47004 !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    border-left-color: #a93226 !important;
+}
+
+/* ================================================
+   CORPO DA TIMELINE
+   ================================================ */
+
+.react-calendar-timeline .rct-sidebar {
+    background: #f7f7f7 !important;
+    border-right: 1px solid #d7d7d7 !important;
+}
+
+.react-calendar-timeline .rct-sidebar-row {
+    border-bottom: 1px solid #ececec !important;
+    background: #fafafa !important;
+}
+
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-even,
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
+    border-bottom: 1px solid #ececec !important;
+    background: #fcfcfc !important;
+}
+
+.react-calendar-timeline .rct-vertical-lines .rct-vl {
+    border-left: 1px solid #e8e8e8 !important;
+}
+
+.react-calendar-timeline .rct-today {
+    background: rgba(192, 57, 43, 0.06) !important;
+}
+
+/* ================================================
+   ITENS
+   ================================================ */
+
+.react-calendar-timeline .rct-item {
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    border: none !important;
+    font-family: 'Ubuntu', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+
+.react-calendar-timeline .rct-item.selected {
+    box-shadow: 0 0 0 2px rgba(60, 60, 60, 0.25) !important;
+}
+
+/* ================================================
+   GRUPOS
+   ================================================ */
+
+.macro-header {
+    color: white;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 8px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.atividade-label {
+    padding-left: 26px;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.2;
+    white-space: normal;
+    font-weight: 400;
+    color: #222;
+}
+
+/* ================================================
+   PAINEL LATERAL
+   ================================================ */
+
+#painel_detalhe {
+    font-family: 'Ubuntu', sans-serif !important;
+    background: #f8f8f8 !important;
+    border: 1px solid #dddddd !important;
+    border-radius: 10px !important;
+}
+
+.semana-atual-col {
+    background: #7b1f1f !important;
+    color: #fff !important;
+}
+
+.react-calendar-timeline .rct-sidebar-header {
+    background: #046b7e !important;
+    border-right: 0px solid #3a3a3a !important;
+}
