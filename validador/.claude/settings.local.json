@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"c:/MAMP/htdocs/validador\" config user.name)",
+      "Bash(git -C \"c:/MAMP/htdocs/validador\" config user.email)",
+      "Bash(gh api:*)",
+      "Bash(git -C \"c:/MAMP/htdocs/validador\" config user.name \"sergiofco\")",
+      "Bash(git -C \"c:/MAMP/htdocs/validador\" config user.email \"sergiofco@users.noreply.github.com\")",
+      "Bash(gh repo:*)"
+    ]
+  }
+}
