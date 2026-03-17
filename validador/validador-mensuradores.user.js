@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Validador de Mensuradores
 // @namespace    https://github.com/sergiofco
-// @version      1.0.0
-// @description  Valida que Presenças <= Inscritos no dia antes de salvar o registro de mensuradores
+// @version      1.1.0
+// @description  Valida lançamento de mensuradores antes de salvar, por tipo de realização
 // @author       sergiofco
 // @include      /^https?:\/\/webapps\.[^/]+\.sescsp\.org\.br\/estatistico\//
 // @updateURL    https://raw.githubusercontent.com/sergiofco/validador/main/validador/validador-mensuradores.user.js
@@ -12,6 +12,8 @@
 
 (function () {
     'use strict';
+
+    // ─── Utilitários ────────────────────────────────────────────────────────────
 
     const COLUNAS = [
         'Pleno - Titular',
@@ -33,24 +35,37 @@
         });
     }
 
-    function validar() {
-        const sections = Array.from(document.querySelectorAll('section.mensuradores-section'));
+    function getSecaoPorTitulo(titulo) {
+        return Array.from(document.querySelectorAll('section.mensuradores-section'))
+            .find(s => s.querySelector('h5')?.textContent.trim() === titulo) || null;
+    }
 
-        let inscritosSection = null;
-        let presencasSection = null;
+    function getRealizacao() {
+        return document.querySelector('span[ng-bind="vm.sessao.realizacao"]')?.textContent.trim() || null;
+    }
 
-        sections.forEach(s => {
-            const titulo = s.querySelector('h5')?.textContent.trim();
-            if (titulo === 'Inscritos no dia') inscritosSection = s;
-            if (titulo === 'Presenças') presencasSection = s;
-        });
+    // ─── Validações por tipo de realização ──────────────────────────────────────
 
-        if (!inscritosSection || !presencasSection) return true;
+    /**
+     * Registro de validações: cada chave é um valor de vm.sessao.realizacao.
+     * O valor é uma função que retorna um array de strings de erro (vazio = válido).
+     *
+     * Para adicionar uma nova validação:
+     *   VALIDACOES['NomeDoTipo'] = function() { return []; }
+     */
+    const VALIDACOES = {};
+
+    // Oficina: Presenças <= Inscritos no dia, célula a célula
+    VALIDACOES['Oficina'] = function () {
+        const erros = [];
+
+        const inscritosSection = getSecaoPorTitulo('Inscritos no dia');
+        const presencasSection = getSecaoPorTitulo('Presenças');
+
+        if (!inscritosSection || !presencasSection) return erros;
 
         const inscritosLinhas = getLinhas(inscritosSection);
         const presencasLinhas = getLinhas(presencasSection);
-
-        const erros = [];
 
         inscritosLinhas.forEach((inscLinha, linhaIdx) => {
             const presLinha = presencasLinhas[linhaIdx];
@@ -70,9 +85,21 @@
             });
         });
 
+        return erros;
+    };
+
+    // ─── Motor de validação ──────────────────────────────────────────────────────
+
+    function validar() {
+        const realizacao = getRealizacao();
+
+        if (!realizacao || !VALIDACOES[realizacao]) return true;
+
+        const erros = VALIDACOES[realizacao]();
+
         if (erros.length > 0) {
             alert(
-                'Validação de Mensuradores — erro encontrado:\n\n' +
+                `Validação de Mensuradores [${realizacao}] — erro encontrado:\n\n` +
                 erros.join('\n') +
                 '\n\nO registro não foi salvo. Corrija os valores e tente novamente.'
             );
@@ -81,6 +108,8 @@
 
         return true;
     }
+
+    // ─── Inicialização ───────────────────────────────────────────────────────────
 
     function ativar() {
         document.addEventListener('click', function (e) {
