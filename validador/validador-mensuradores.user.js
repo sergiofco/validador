@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Validador de Mensuradores
 // @namespace    https://github.com/sergiofco
-// @version      1.1.0
+// @version      1.2.0
 // @description  Valida lançamento de mensuradores antes de salvar, por tipo de realização
 // @author       sergiofco
 // @include      /^https?:\/\/webapps\.[^/]+\.sescsp\.org\.br\/estatistico\//
@@ -84,6 +84,23 @@
                 }
             });
         });
+
+        return erros;
+    };
+
+    // Intervenção urbana: único campo em tela deve ser exatamente 1
+    VALIDACOES['Intervenção urbana'] = function () {
+        const erros = [];
+
+        const inputs = Array.from(document.querySelectorAll('tabela-mensuradores input[ui-number-mask]'));
+
+        if (inputs.length === 0) return erros;
+
+        const valor = parseValor(inputs[0]);
+
+        if (valor !== 1) {
+            erros.push(`• O campo deve ser exatamente 1 (valor informado: ${valor})`);
+        }
 
         return erros;
     };
