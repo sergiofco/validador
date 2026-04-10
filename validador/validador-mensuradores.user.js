@@ -94,7 +94,10 @@
 
         const inputs = Array.from(document.querySelectorAll('tabela-mensuradores input[ui-number-mask]'));
 
-        if (inputs.length === 0) return erros;
+        if (inputs.length === 0) {
+            erros.push('• Nenhum campo de mensurador encontrado na página');
+            return erros;
+        }
 
         const valor = parseValor(inputs[0]);
 
@@ -109,10 +112,15 @@
 
     function validar() {
         const realizacao = getRealizacao();
+        if (!realizacao) return true;
 
-        if (!realizacao || !VALIDACOES[realizacao]) return true;
+        const chave = Object.keys(VALIDACOES).find(
+            k => k.normalize('NFC') === realizacao.normalize('NFC')
+        );
 
-        const erros = VALIDACOES[realizacao]();
+        if (!chave) return true;
+
+        const erros = VALIDACOES[chave]();
 
         if (erros.length > 0) {
             alert(
