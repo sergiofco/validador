@@ -114,8 +114,9 @@
         const realizacao = getRealizacao();
         if (!realizacao) return true;
 
+        const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         const chave = Object.keys(VALIDACOES).find(
-            k => k.normalize('NFC') === realizacao.normalize('NFC')
+            k => norm(k) === norm(realizacao)
         );
 
         if (!chave) return true;
