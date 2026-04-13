@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Validador de Mensuradores
 // @namespace    https://github.com/sergiofco
-// @version      1.2.0
+// @version      1.3.0
 // @description  Valida lançamento de mensuradores antes de salvar, por tipo de realização
 // @author       sergiofco
 // @include      /^https?:\/\/webapps\.[^/]+\.sescsp\.org\.br\/estatistico\//
@@ -84,6 +84,29 @@
                 }
             });
         });
+
+        return erros;
+    };
+
+    // Competições físico-esportivas: ao menos um campo de "Partidas / Provas" deve ser > 0
+    VALIDACOES['Competições físico-esportivas'] = function () {
+        const erros = [];
+
+        const linhaPartidas = Array.from(document.querySelectorAll('tbody tr')).find(tr =>
+            tr.querySelector('span[ng-bind="line.title"]')?.textContent.trim() === 'Partidas / Provas'
+        );
+
+        if (!linhaPartidas) {
+            erros.push('• Linha "Partidas / Provas" não encontrada na página');
+            return erros;
+        }
+
+        const inputs = Array.from(linhaPartidas.querySelectorAll('input[ui-number-mask]'));
+        const algumPreenchido = inputs.some(inp => parseValor(inp) > 0);
+
+        if (!algumPreenchido) {
+            erros.push('• Partidas / Provas: ao menos uma coluna deve ser maior que zero');
+        }
 
         return erros;
     };
