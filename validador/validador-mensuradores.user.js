@@ -91,10 +91,18 @@
     // Competições físico-esportivas: ao menos um campo de "Partidas / Provas" deve ser > 0
     VALIDACOES['Competições físico-esportivas'] = function () {
         const erros = [];
+        const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
-        const linhaPartidas = Array.from(document.querySelectorAll('tbody tr')).find(tr =>
-            tr.querySelector('span[ng-bind="line.title"]')?.textContent.trim() === 'Partidas / Provas'
-        );
+        const allTrs = Array.from(document.querySelectorAll('tr'));
+        console.log('[Validador] total de <tr> encontrados:', allTrs.length);
+
+        const linhaPartidas = allTrs.find(tr => {
+            const span = tr.querySelector('span[ng-bind="line.title"]');
+            if (!span) return false;
+            const txt = span.textContent.trim();
+            console.log('[Validador] linha encontrada:', JSON.stringify(txt));
+            return norm(txt) === norm('Partidas / Provas');
+        });
 
         if (!linhaPartidas) {
             erros.push('• Linha "Partidas / Provas" não encontrada na página');
@@ -102,6 +110,7 @@
         }
 
         const inputs = Array.from(linhaPartidas.querySelectorAll('input[ui-number-mask]'));
+        console.log('[Validador] inputs em Partidas/Provas:', inputs.map(i => JSON.stringify(i.value)));
         const algumPreenchido = inputs.some(inp => parseValor(inp) > 0);
 
         if (!algumPreenchido) {
@@ -138,9 +147,14 @@
         if (!realizacao) return true;
 
         const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        console.log('[Validador] realizacao detectada:', JSON.stringify(realizacao));
+        console.log('[Validador] chaves registradas:', Object.keys(VALIDACOES).map(k => JSON.stringify(k)));
+
         const chave = Object.keys(VALIDACOES).find(
             k => norm(k) === norm(realizacao)
         );
+
+        console.log('[Validador] chave encontrada:', chave ?? '(nenhuma)');
 
         if (!chave) return true;
 
