@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Validador de Mensuradores
 // @namespace    https://github.com/sergiofco
-// @version      1.3.0
+// @version      1.5.0
 // @description  Valida lançamento de mensuradores antes de salvar, por tipo de realização
 // @author       sergiofco
 // @include      /^https?:\/\/webapps\.[^/]+\.sescsp\.org\.br\/estatistico\//
@@ -35,15 +35,37 @@
         });
     }
 
+    function lerTotal(section) {
+        const txt = section.querySelector('span.totalizador-total-total')?.textContent.trim() || '0';
+        return parseInt(txt.replace(/\D/g, ''), 10) || 0;
+    }
+
     function getSecaoPorTitulo(titulo) {
         return Array.from(document.querySelectorAll('section.mensuradores-section'))
             .find(s => s.querySelector('h5')?.textContent.trim() === titulo) || null;
     }
 
-    function getRealizacao() {
-        const modalidade = document.querySelector('span[ng-bind="vm.sessao.modalidade"]')?.textContent.trim();
-        if (modalidade) return modalidade;
-        return document.querySelector('span[ng-bind="vm.sessao.realizacao"]')?.textContent.trim() || null;
+    /**
+     * Retorna lista de candidatos de identificação, do mais específico ao menos:
+     * [realizacao, modalidade, atividade]
+     * O motor tenta cada um até encontrar uma chave em VALIDACOES.
+     */
+    function getCandidatos() {
+        const candidatos = [];
+
+        const breadcrumb = document.querySelector('span[ng-bind*="vm.sessao.modalidade"]')?.textContent.trim();
+        if (breadcrumb) {
+            const partes = breadcrumb.split('>>').map(p => p.trim()).filter(Boolean);
+            // partes[2] = modalidade, partes[1] = atividade — testados antes da realizacao
+            if (partes[2]) candidatos.push(partes[2]);
+            if (partes[1]) candidatos.push(partes[1]);
+        }
+
+        const realizacao = document.querySelector('span[ng-bind="vm.sessao.realizacao"]')?.textContent.trim();
+        if (realizacao) candidatos.push(realizacao);
+
+        console.log('[Validador] candidatos:', candidatos);
+        return candidatos;
     }
 
     // ─── Validações por tipo de realização ──────────────────────────────────────
@@ -87,6 +109,7 @@
             });
         });
 
+        erros.push(...validarPresencasNaoZero());
         return erros;
     };
 
@@ -95,7 +118,13 @@
         const erros = [];
         const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
-        const linhaPartidas = Array.from(document.querySelectorAll('tr')).find(tr =>
+        const todasLinhas = Array.from(document.querySelectorAll('tr'));
+        console.log('[Validador] Competições: total de <tr>:', todasLinhas.length);
+        console.log('[Validador] Competições: títulos encontrados:',
+            todasLinhas.map(tr => tr.querySelector('span[ng-bind="line.title"]')?.textContent.trim()).filter(Boolean)
+        );
+
+        const linhaPartidas = todasLinhas.find(tr =>
             norm(tr.querySelector('span[ng-bind="line.title"]')?.textContent.trim() || '') === norm('Partidas / Provas')
         );
 
@@ -105,14 +134,58 @@
         }
 
         const inputs = Array.from(linhaPartidas.querySelectorAll('input[ui-number-mask]'));
+        console.log('[Validador] Competições: inputs em Partidas/Provas:', inputs.length, inputs.map(i => JSON.stringify(i.value)));
         const algumPreenchido = inputs.some(inp => parseValor(inp) > 0);
 
         if (!algumPreenchido) {
             erros.push('• Partidas / Provas: ao menos uma coluna deve ser maior que zero');
         }
 
+        erros.push(...validarPresencasNaoZero());
         return erros;
     };
+
+    // Viagens / Passeios: Total de Inscritos no dia == Total de Procedência dos inscritos
+    function validarTotalInscritos() {
+        const erros = [];
+
+        const inscritosSection   = getSecaoPorTitulo('Inscritos no dia');
+        const procedenciaSection = getSecaoPorTitulo('Procedência dos inscritos');
+
+        if (!inscritosSection || !procedenciaSection) return erros;
+
+        const totalInscritos   = lerTotal(inscritosSection);
+        const totalProcedencia = lerTotal(procedenciaSection);
+
+        if (totalInscritos !== totalProcedencia) {
+            erros.push(
+                `• Total de Inscritos no dia (${totalInscritos}) ≠ ` +
+                `Total de Procedência dos inscritos (${totalProcedencia})`
+            );
+        }
+
+        erros.push(...validarPresencasNaoZero());
+        return erros;
+    }
+
+    // Regra compartilhada: inscritos > 0 com presenças zeradas
+    function validarPresencasNaoZero() {
+        const erros = [];
+        const inscritosSection = getSecaoPorTitulo('Inscritos no dia');
+        const presencasSection = getSecaoPorTitulo('Presenças');
+        if (!inscritosSection || !presencasSection) return erros;
+
+        const totalInscritos = lerTotal(inscritosSection);
+        const totalPresencas = lerTotal(presencasSection);
+
+        if (totalInscritos > 0 && totalPresencas === 0) {
+            erros.push(`• Presenças zeradas com ${totalInscritos} inscrito(s) no dia`);
+        }
+        return erros;
+    }
+
+    VALIDACOES['Viagens']  = validarTotalInscritos;
+    VALIDACOES['Passeios'] = validarTotalInscritos;
 
     // Intervenção urbana: único campo em tela deve ser exatamente 1
     VALIDACOES['Intervenção urbana'] = function () {
@@ -137,13 +210,20 @@
     // ─── Motor de validação ──────────────────────────────────────────────────────
 
     function validar() {
-        const realizacao = getRealizacao();
-        if (!realizacao) return true;
+        const candidatos = getCandidatos();
+        if (candidatos.length === 0) return true;
 
         const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-        const chave = Object.keys(VALIDACOES).find(
-            k => norm(k) === norm(realizacao)
-        );
+        const chaves = Object.keys(VALIDACOES);
+        console.log('[Validador] chaves registradas:', chaves);
+
+        let chave = null;
+        let candidatoUsado = null;
+        for (const c of candidatos) {
+            chave = chaves.find(k => norm(k) === norm(c)) ?? null;
+            if (chave) { candidatoUsado = c; break; }
+        }
+        console.log('[Validador] chave matched:', chave ?? '(nenhuma)', '← candidato:', candidatoUsado);
 
         if (!chave) return true;
 
@@ -151,7 +231,7 @@
 
         if (erros.length > 0) {
             alert(
-                `Validação de Mensuradores [${realizacao}] — erro encontrado:\n\n` +
+                `Validação de Mensuradores [${chave}] — erro encontrado:\n\n` +
                 erros.join('\n') +
                 '\n\nO registro não foi salvo. Corrija os valores e tente novamente.'
             );
