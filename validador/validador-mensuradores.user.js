@@ -10,6 +10,26 @@
 // @grant        none
 // ==/UserScript==
 
+/*
+ * Regras de validação aplicadas
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Oficina
+ *   • Presenças não pode ser maior que Inscritos no dia (célula a célula)
+ *   • Presenças não pode ser zero quando há Inscritos no dia
+ *
+ * Competições físico-esportivas
+ *   • Ao menos um campo de Partidas / Provas deve ser maior que zero
+ *   • Presenças não pode ser zero quando há Inscritos no dia
+ *
+ * Viagens / Passeios
+ *   • Total de Inscritos no dia deve ser igual ao Total de Procedência dos inscritos
+ *   • Presenças não pode ser zero quando há Inscritos no dia
+ *
+ * Intervenção urbana
+ *   • O único campo de mensurador deve ser exatamente 1
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
 (function () {
     'use strict';
 
