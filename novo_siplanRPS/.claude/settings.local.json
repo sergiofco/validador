@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash('c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe' -c ' *)"
+      "Bash('c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe' -c ' *)",
+      "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\")"
     ]
   }
 }
