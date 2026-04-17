@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash('c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe' -c ' *)",
-      "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\")"
+      "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\")",
+      "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\" \"c:/tmp/estudo_norm.py\")",
+      "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\" \"c:/tmp/patch_cell1.py\")",
+      "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\" \"c:/tmp/patch_build.py\")",
+      "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\" \"c:/tmp/fix_final.py\")"
     ]
   }
 }
