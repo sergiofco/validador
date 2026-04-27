@@ -6,7 +6,12 @@
       "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\" \"c:/tmp/estudo_norm.py\")",
       "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\" \"c:/tmp/patch_cell1.py\")",
       "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\" \"c:/tmp/patch_build.py\")",
-      "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\" \"c:/tmp/fix_final.py\")"
+      "Bash(\"c:\\\\Users\\\\sergio.seabra\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe\" \"c:/tmp/fix_final.py\")",
+      "Bash(python -c ' *)",
+      "Bash(python3 -c ' *)",
+      "PowerShell(py \"C:/Users/sergio.seabra/tmp/gen_gold.py\")",
+      "PowerShell(py \"C:/Users/sergio.seabra/tmp/verify_gold.py\")",
+      "PowerShell(py \"C:/Users/sergio.seabra/tmp/check_cells.py\")"
     ]
   }
 }
