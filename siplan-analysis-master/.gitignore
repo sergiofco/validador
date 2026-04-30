@@ -1,0 +1,8 @@
+.claude/
+data.csv
+output/
+iframe_figures/
+_tmp_repo/
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
