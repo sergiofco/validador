@@ -11,7 +11,9 @@
       "Bash(python3 -c ' *)",
       "PowerShell(py \"C:/Users/sergio.seabra/tmp/gen_gold.py\")",
       "PowerShell(py \"C:/Users/sergio.seabra/tmp/verify_gold.py\")",
-      "PowerShell(py \"C:/Users/sergio.seabra/tmp/check_cells.py\")"
+      "PowerShell(py \"C:/Users/sergio.seabra/tmp/check_cells.py\")",
+      "Bash(/c/Users/sergio.seabra/AppData/Local/Programs/Python/Python311/python.exe c:/MAMP/htdocs/novo_siplanRPS/_fix_tem_educador.py)",
+      "Bash(/c/Users/sergio.seabra/AppData/Local/Programs/Python/Python311/python.exe c:/MAMP/htdocs/novo_siplanRPS/_fix_perm.py)"
     ]
   }
 }
