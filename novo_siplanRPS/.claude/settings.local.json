@@ -13,7 +13,10 @@
       "PowerShell(py \"C:/Users/sergio.seabra/tmp/verify_gold.py\")",
       "PowerShell(py \"C:/Users/sergio.seabra/tmp/check_cells.py\")",
       "Bash(/c/Users/sergio.seabra/AppData/Local/Programs/Python/Python311/python.exe c:/MAMP/htdocs/novo_siplanRPS/_fix_tem_educador.py)",
-      "Bash(/c/Users/sergio.seabra/AppData/Local/Programs/Python/Python311/python.exe c:/MAMP/htdocs/novo_siplanRPS/_fix_perm.py)"
+      "Bash(/c/Users/sergio.seabra/AppData/Local/Programs/Python/Python311/python.exe c:/MAMP/htdocs/novo_siplanRPS/_fix_perm.py)",
+      "Read(//tmp/**)",
+      "Bash(python3)",
+      "PowerShell($nb = Get-Content \"c:\\\\Users\\\\INTEL\\\\Documents\\\\GitHub\\\\validador\\\\novo_siplanRPS\\\\nb_gold_siplan.ipynb\" | ConvertFrom-Json; $cells = $nb.cells | Where-Object { $_.cell_type -eq 'code' }; Write-Host \"Total code cells: $\\($cells.Count\\)\"; $code_text = $cells | ForEach-Object { \\($_.source -join ''\\) + \"`n\" } | Out-String; $lines = $code_text -split \"`n\"; $lines | Select-String -Pattern \"merge|join\" -AllMatches | Select-Object -First 30 | ForEach-Object { $_.Line.Substring\\(0, [Math]::Min\\(150, $_.Line.Length\\)\\) })"
     ]
   }
 }
