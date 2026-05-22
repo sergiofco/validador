@@ -136,7 +136,7 @@ RESULTADOS_GRAVAM = {'Completo', 'Parcial'}
 | `atividade_id` | `base.atividade_id` | |
 | `nome` | `base.nome` | |
 | `Título` | `base.nome` | campo SharePoint obrigatório |
-| `unidade` | `dim_unidade.unidade` | JOIN ON `CAST(LEFT(CAST(atividade_id,2),INT)=uo` |
+| `unidade` | `dim_unidade.unidade` | JOIN ON `b.uo = du.uo` (coluna direta de `base`, sem derivação por prefixo) |
 | `gerencia` | `base.gerencia` | |
 | `area` | `base.areaprog` | |
 | `linguagem` | `base.linguagem` | |
