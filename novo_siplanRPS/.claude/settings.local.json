@@ -18,7 +18,8 @@
       "Bash(python3)",
       "PowerShell($nb = Get-Content \"c:\\\\Users\\\\INTEL\\\\Documents\\\\GitHub\\\\validador\\\\novo_siplanRPS\\\\nb_gold_siplan.ipynb\" | ConvertFrom-Json; $cells = $nb.cells | Where-Object { $_.cell_type -eq 'code' }; Write-Host \"Total code cells: $\\($cells.Count\\)\"; $code_text = $cells | ForEach-Object { \\($_.source -join ''\\) + \"`n\" } | Out-String; $lines = $code_text -split \"`n\"; $lines | Select-String -Pattern \"merge|join\" -AllMatches | Select-Object -First 30 | ForEach-Object { $_.Line.Substring\\(0, [Math]::Min\\(150, $_.Line.Length\\)\\) })",
       "Bash(powershell -Command ' *)",
-      "PowerShell(& \"C:\\Users\\sergio.seabra\\AppData\\Local\\Programs\\Python\\Python311\\python.exe\" *)"
+      "PowerShell(& \"C:\\Users\\sergio.seabra\\AppData\\Local\\Programs\\Python\\Python311\\python.exe\" *)",
+      "Bash(python)"
     ]
   }
 }

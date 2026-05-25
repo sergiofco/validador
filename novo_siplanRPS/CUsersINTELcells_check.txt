@@ -1,0 +1,75 @@
+=== cell 55 ===
+# Justificativa: concatena textos de raw_acoes_txts separados por linha em branco
+_txt_cols = ['sinopse_curta', 'sinopse_aprovacao', 'info_parceria', 'just_recursos']
+
+justificativa_df = (
+    raw_acoes_txts_df[['acao.atividade_id'] + [c for c in _txt_cols if c in raw_acoes_txts_df.columns]]
+    .rename(columns={'acao.atividade_id': 'atividade_id'})
+    .drop_duplicates(subset=['atividade_id'])
+    .copy()
+)
+
+def _join_partes(row):
+    parts = []
+    for c in _txt_cols:
+        if c in row.index
+
+=== cell 56 ===
+tabela_base_df = build_tabela_base(
+    raw_acoes_df        = raw_acoes_df,
+    datas_df            = datas_df,
+    autonomias_df       = autonomias_df,
+    raw_projetos_df     = raw_projetos_df,
+    todas_as_datas_df   = todas_as_datas_df,
+    raw_tags_df         = raw_tags_df,
+    solicitacoes_desc_df= solicitacoes_desc_df,
+    contracts_df        = contracts_df,
+    raw_acessibilidade_df = raw_acessibilidade_df,
+    raw_pcap_df         = raw_pcap_df,
+    raw_datas_sessoes_df= raw_datas_sessoe
+
+=== cell 57 ===
+# ── bins para histogramas de custo (colunas físicas — Direct Lake não suporta calculadas)
+_BINS_SESSAO = [0,   100,   250,   500, 1_000, 2_500, 5_000, float('inf')]
+_LBLS_SESSAO = ['0–100', '100–250', '250–500', '500–1k', '1k–2.5k', '2.5k–5k', '5k+']
+
+_BINS_HORA   = [0,    50,   100,   200,   500, 1_000, float('inf')]
+_LBLS_HORA   = ['0–50', '50–100', '100–200', '200–500', '500–1k', '1k+']
+
+_BINS_CAPITA = [0,    10,    25,    50,   100,   250,   500, float('inf')]
+_LBLS_CAPITA = ['0–10', '10–25
+
+=== cell 58 ===
+hist_custo_df, hist_apresentacao_df = build_hist_custo(tabela_base_df, raw_datas_sessoes_df)
+
+print(f'hist_custo_df:        {hist_custo_df.shape}')
+print(f'hist_apresentacao_df: {hist_apresentacao_df.shape}')
+print()
+print('faixa_custo_sessao:')
+print(hist_custo_df['faixa_custo_sessao'].value_counts().sort_index())
+print()
+print('faixa_per_capita:')
+print(hist_custo_df['faixa_per_capita'].value_counts().sort_index())
+
+
+=== cell 59 ===
+### Verifica se os joins geraram mais de uma linha
+
+=== cell 60 ===
+# Isola as linhas duplicadas
+raw_acoes_orig = read_raw(f'raw_acoes{_all}')
+raw_acoes_orig['atividade_id'] = raw_acoes_orig['atividade_id'].astype(str).str.strip()
+
+mask_dup = raw_acoes_orig.duplicated(subset=['atividade_id'], keep=False)
+dupes = raw_acoes_orig[mask_dup].sort_values('atividade_id')
+
+# Quais colunas variam entre as cópias de uma mesma atividade_id?
+cols_variam = [
+    col for col in dupes.columns
+    if dupes.groupby('atividade_id')[col].nunique().max() > 1
+]
+print('Colunas com va
+
+=== cell 61 ===
+## Define as gerências
+

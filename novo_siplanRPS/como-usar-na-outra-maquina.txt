@@ -1,0 +1,11 @@
+Como usar na outra máquina:
+
+Opção 1 — restaurar a memória automática (recomendado):
+
+Clone o repo normalmente
+Crie a pasta ~/.claude/projects/<slug>/memory/ na nova máquina (o slug é o caminho do projeto com - no lugar de separadores)
+Copie os arquivos .md de volta para lá — ou use o arquivo consolidado como base para recriar cada um
+Opção 2 — usar como contexto inicial:
+
+Cole o conteúdo do arquivo no início de uma conversa nova e peça ao Claude para carregar a memória
+O arquivo contém todas as memórias: métricas de custo/per capita, diagnóstico de público, ambiente Fabric, formatos de notebook, RLS, fluxo de autorização, entrega de programações, status do fluxo e a Matriz Pompeia.
