@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Análise SiplanRPS</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px; background: #f3f3f3; color: #1a1a1a;
+    }
+    header {
+      background: #0078d4; color: white;
+      padding: 10px 20px; display: flex; align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    h1 { font-size: 15px; font-weight: 600; }
+    #user-info { font-size: 11px; opacity: 0.85; }
+    #filters {
+      background: white; padding: 8px 20px;
+      border-bottom: 1px solid #ddd;
+      display: none; flex-wrap: wrap; align-items: center; gap: 12px;
+    }
+    #filters label { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+    #filters select, #filters input {
+      border: 1px solid #ccc; border-radius: 4px; padding: 3px 7px; font-size: 12px;
+    }
+    #filters input[type="text"] { width: 180px; }
+    button {
+      background: #0078d4; color: white; border: none;
+      border-radius: 4px; padding: 5px 13px; cursor: pointer; font-size: 12px;
+    }
+    button:hover:not(:disabled) { background: #006cbe; }
+    button:disabled { opacity: 0.45; cursor: default; }
+    #main { padding: 14px 20px; }
+    #msg { margin-bottom: 10px; padding: 9px 14px; border-radius: 5px; font-size: 12px; display: none; }
+    #msg.error   { background: #fde7e9; color: #a4262c; border-left: 4px solid #a4262c; }
+    #msg.info    { background: #ddf4ff; color: #003a6c; border-left: 4px solid #0078d4; }
+    #msg.ok      { background: #dff6dd; color: #107c10; border-left: 4px solid #107c10; }
+    #loading { text-align: center; padding: 50px; color: #666; font-size: 14px; }
+    #table-wrapper { overflow-x: auto; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); display: none; }
+    table { width: 100%; border-collapse: collapse; background: white; font-size: 12px; }
+    thead th {
+      background: #f0f2f5; border-bottom: 2px solid #d0d0d0;
+      padding: 7px 10px; text-align: left; white-space: nowrap;
+      font-weight: 600; color: #444;
+    }
+    tbody tr:nth-child(even) { background: #fafafa; }
+    tbody tr:hover { background: #ebf3fb; }
+    td { border-bottom: 1px solid #eee; padding: 5px 10px; vertical-align: top; }
+    .col-id { width: 65px; text-align: right; color: #888; font-size: 11px; }
+    .col-nome { min-width: 180px; max-width: 240px; }
+    .col-sm { min-width: 90px; max-width: 140px; }
+    .col-xs { width: 75px; white-space: nowrap; }
+    .col-custos { min-width: 150px; max-width: 190px; }
+    .col-status { width: 175px; }
+    .col-dt { width: 110px; white-space: nowrap; font-size: 11px; color: #666; }
+    .col-quem { min-width: 130px; max-width: 170px; font-size: 11px; color: #555; }
+    .col-acao { width: 80px; text-align: center; }
+    .custo-text {
+      white-space: pre-wrap; font-size: 11px; color: #666;
+      max-height: 55px; overflow-y: auto; line-height: 1.4;
+    }
+    .status-select {
+      width: 100%; padding: 3px 6px; border: 1px solid #bbb;
+      border-radius: 4px; font-size: 12px; background: white;
+    }
+    .status-select:disabled {
+      background: transparent; border-color: transparent; color: #222;
+      -webkit-appearance: none; appearance: none; cursor: default; pointer-events: none;
+    }
+    .btn-save { padding: 3px 9px; font-size: 12px; background: #107c10; }
+    .btn-save:hover:not(:disabled) { background: #0b6b0b; }
+    .save-icon { display: inline-block; width: 16px; text-align: center; }
+    .row-info { font-size: 11px; color: #888; margin-bottom: 7px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Análise SiplanRPS</h1>
+  <span id="user-info">conectando…</span>
+</header>
+
+<div id="filters">
+  <label>Unidade: <select id="f-unidade" onchange="applyFilters()"><option value="">Todas</option></select></label>
+  <label>Gerência: <select id="f-gerencia" onchange="applyFilters()"><option value="">Todas</option></select></label>
+  <label>Status: <select id="f-status" onchange="applyFilters()"><option value="">Todos</option></select></label>
+  <label>Buscar: <input type="text" id="f-search" placeholder="nome da atividade…" oninput="applyFilters()"></label>
+  <button onclick="loadData()">↻ Atualizar</button>
+</div>
+
+<div id="main">
+  <div id="msg"></div>
+  <div id="loading">Autenticando e carregando dados…</div>
+  <div class="row-info" id="row-count" style="display:none"></div>
+  <div id="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-id">ID</th>
+          <th class="col-nome">Atividade</th>
+          <th class="col-sm">Unidade</th>
+          <th class="col-sm">Gerência</th>
+          <th class="col-sm">Área</th>
+          <th class="col-sm">Linguagem</th>
+          <th class="col-xs">Mês</th>
+          <th class="col-xs">Aut.</th>
+          <th class="col-xs">1ª Sessão</th>
+          <th class="col-custos">Custos (foto)</th>
+          <th class="col-custos">Custos (edit.)</th>
+          <th class="col-status">Status</th>
+          <th class="col-dt">Entregue em</th>
+          <th class="col-quem">Solicitante</th>
+          <th class="col-acao"></th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const EDITABLE_STATUSES = new Set(['Enviada', 'Reenviada', 'Em revisão', 'AutonomiaUO']);
+const STATUS_OPTIONS    = ['Enviada','Reenviada','Em revisão','AutonomiaUO','Aprovado','Não aprovado'];
+
+let allData = [], filteredData = [];
+
+// ── Inicialização ─────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  // Mostra e-mail do usuário (vem do token decodificado pelo servidor)
+  try {
+    const r = await fetch('/api/whoami');
+    const d = await r.json();
+    document.getElementById('user-info').textContent = d.email || '';
+  } catch { /* silencia */ }
+
+  await loadData();
+});
+
+// ── Dados ─────────────────────────────────────────────────────────────────────
+async function loadData() {
+  setLoading(true);
+  showMsg('', '');
+  try {
+    const resp = await fetch('/api/data');
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || `HTTP ${resp.status}`);
+
+    allData = parseRows(data);
+    document.getElementById('filters').style.display = 'flex';
+    populateFilters(allData);
+    applyFilters();
+    document.getElementById('table-wrapper').style.display = 'block';
+  } catch (err) {
+    showMsg('Erro ao carregar dados: ' + err.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+function parseRows(data) {
+  if (data.results && Array.isArray(data.results) && data.results.length > 0) {
+    const r    = data.results[0];
+    const cols = (r.columns || []).map(c => c.name || c.columnName);
+    return (r.rows || []).map(row => {
+      const obj = {};
+      cols.forEach((c, i) => { obj[c] = row[i]; });
+      return obj;
+    });
+  }
+  if (data.schema && data.rows) {
+    const cols = data.schema.map(c => c.name);
+    return data.rows.map(row => {
+      const obj = {};
+      cols.forEach((c, i) => { obj[c] = row[i]; });
+      return obj;
+    });
+  }
+  throw new Error('Formato de resposta desconhecido: ' + JSON.stringify(Object.keys(data)));
+}
+
+// ── Salvar ────────────────────────────────────────────────────────────────────
+async function saveRow(rowIdx, atividade_id) {
+  const sel  = document.getElementById(`sel-${rowIdx}`);
+  const btn  = document.getElementById(`btn-${rowIdx}`);
+  const icon = document.getElementById(`ico-${rowIdx}`);
+
+  btn.disabled = true;
+  sel.disabled = true;
+  icon.textContent = '⏳';
+
+  try {
+    const resp = await fetch('/api/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ atividade_id, new_status: sel.value }),
+    });
+    const result = await resp.json();
+    if (!resp.ok) throw new Error(result.error || `HTTP ${resp.status}`);
+
+    const ns = sel.value;
+    [allData, filteredData].forEach(arr => {
+      const r = arr.find(x => String(x.atividade_id) === String(atividade_id));
+      if (r) r.Status = ns;
+    });
+
+    icon.textContent = '✓';
+    icon.style.color = '#107c10';
+    showMsg(`Atividade ${atividade_id} → "${ns}" salvo.`, 'ok');
+
+    setTimeout(() => {
+      if (!EDITABLE_STATUSES.has(ns)) {
+        sel.disabled = true;
+        btn.style.display = 'none';
+      } else {
+        sel.disabled = false;
+        btn.disabled = false;
+      }
+      icon.textContent = '';
+      icon.style.color = '';
+    }, 2500);
+
+  } catch (err) {
+    icon.textContent = '✗';
+    icon.style.color = '#a4262c';
+    showMsg('Erro ao salvar atividade ' + atividade_id + ': ' + err.message, 'error');
+    sel.disabled = false;
+    btn.disabled = false;
+    setTimeout(() => { icon.textContent = ''; icon.style.color = ''; }, 3500);
+  }
+}
+
+// ── Filtros e tabela ──────────────────────────────────────────────────────────
+function populateFilters(data) {
+  fillSelect('f-unidade',  [...new Set(data.map(r => r.unidade).filter(Boolean))].sort());
+  fillSelect('f-gerencia', [...new Set(data.map(r => r.gerencia).filter(Boolean))].sort());
+  fillSelect('f-status',   [...new Set(data.map(r => r.Status).filter(Boolean))].sort());
+}
+
+function fillSelect(id, values) {
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Todas</option>';
+  values.forEach(v => { const o = document.createElement('option'); o.value = o.textContent = v; sel.appendChild(o); });
+  if (values.includes(cur)) sel.value = cur;
+}
+
+function applyFilters() {
+  const u = document.getElementById('f-unidade').value;
+  const g = document.getElementById('f-gerencia').value;
+  const s = document.getElementById('f-status').value;
+  const q = document.getElementById('f-search').value.toLowerCase().trim();
+  filteredData = allData.filter(r =>
+    (!u || r.unidade  === u) &&
+    (!g || r.gerencia === g) &&
+    (!s || r.Status   === s) &&
+    (!q || (r.nome || '').toLowerCase().includes(q))
+  );
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  const rc    = document.getElementById('row-count');
+  rc.style.display = '';
+  rc.textContent = `${filteredData.length} registro${filteredData.length !== 1 ? 's' : ''}` +
+    (filteredData.length < allData.length ? ` (de ${allData.length})` : '');
+
+  if (!filteredData.length) {
+    tbody.innerHTML = '<tr><td colspan="15" style="text-align:center;padding:30px;color:#888">Nenhum registro encontrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filteredData.map((r, i) => {
+    const editable = EDITABLE_STATUSES.has(r.Status);
+    const opts = STATUS_OPTIONS.map(s =>
+      `<option value="${s}"${s === r.Status ? ' selected' : ''}>${s}</option>`).join('');
+    return `<tr>
+      <td class="col-id">${r.atividade_id ?? ''}</td>
+      <td class="col-nome">${esc(r.nome)}</td>
+      <td class="col-sm">${esc(r.unidade)}</td>
+      <td class="col-sm">${esc(r.gerencia)}</td>
+      <td class="col-sm">${esc(r.area)}</td>
+      <td class="col-sm">${esc(r.linguagem)}</td>
+      <td class="col-xs">${esc(r.mes)}</td>
+      <td class="col-xs">${esc(r.autonomia)}</td>
+      <td class="col-xs">${esc(r.dataPrimeiraSessao)}</td>
+      <td class="col-custos"><div class="custo-text">${esc(r.custos_foto)}</div></td>
+      <td class="col-custos"><div class="custo-text">${esc(r.custos_editavel)}</div></td>
+      <td class="col-status">
+        <select class="status-select" id="sel-${i}" ${editable ? '' : 'disabled'}>${opts}</select>
+      </td>
+      <td class="col-dt">${esc(r.data_entrega)}</td>
+      <td class="col-quem">${esc(r.quem)}</td>
+      <td class="col-acao">${editable
+        ? `<button class="btn-save" id="btn-${i}" onclick="saveRow(${i},${r.atividade_id})">Salvar</button>
+           <span class="save-icon" id="ico-${i}"></span>`
+        : `<span style="color:#bbb;font-size:11px">—</span>`
+      }</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function esc(v) {
+  if (v == null || v === '') return '';
+  return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function setLoading(on) {
+  document.getElementById('loading').style.display = on ? '' : 'none';
+  if (on) {
+    document.getElementById('table-wrapper').style.display = 'none';
+    document.getElementById('row-count').style.display = 'none';
+  }
+}
+function showMsg(text, type) {
+  const el = document.getElementById('msg');
+  if (!text) { el.style.display = 'none'; return; }
+  el.className = type; el.textContent = text; el.style.display = '';
+  if (type === 'ok') setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+</script>
+</body>
+</html>
